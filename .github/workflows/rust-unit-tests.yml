@@ -9,7 +9,6 @@ on:
 jobs:
   test:
     name: cargo test (linux)
-    # Tauri v1/webkit2gtk + libsoup2 are reliably available on Ubuntu 22.04.
     runs-on: ubuntu-22.04
 
     steps:
@@ -30,8 +29,8 @@ jobs:
             libssl-dev \
             libgtk-3-dev \
             libudev-dev \
-            libsoup2.4-dev \
-            libwebkit2gtk-4.0-dev \
+            libsoup-3.0-dev \
+            libwebkit2gtk-4.1-dev \
             libayatana-appindicator3-dev \
             librsvg2-dev \
             patchelf
