@@ -64,8 +64,9 @@ Since this app interacts with hardware, ensure your robot is connected to `/dev/
 During this maintenance pass, the Rust modules were evaluated and cleaned up:
 - Added clear Rustdoc comments to improve maintainability.
 - Replaced placeholder serial-port methods with practical implementations for listing/opening/sending/receiving.
-- Fixed G-code filtering to correctly ignore whitespace-only lines.
+- Fixed G-code filtering to correctly ignore whitespace-only lines and inline comments.
 - Switched command queue internals to `VecDeque` for efficient FIFO reads.
+- Added parser/serial defensive limits and input validation to reduce memory or malformed-input risk.
 
 ## 📝 Commit Message Translation Tip (EN + ZH)
 When a commit message starts in Chinese, add an English equivalent in the body so both local and international contributors can quickly understand changes.

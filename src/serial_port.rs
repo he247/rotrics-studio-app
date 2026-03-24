@@ -1,5 +1,8 @@
 use serialport::{available_ports, DataBits, FlowControl, Parity, SerialPort, StopBits};
+use std::io::{Read, Write};
 use std::time::Duration;
+
+const MAX_RECEIVE_BYTES: usize = 8 * 1024;
 
 /// Keeps serial port configuration in one place and provides helper methods
 /// for listing and opening device ports used by Rotrics hardware.
@@ -37,7 +40,11 @@ impl SerialPortManager {
     }
 
     /// Opens the configured serial port and returns a boxed serial port handle.
+    ///
+    /// Basic validation is applied to avoid opening malformed or accidental empty paths.
     pub fn open(&self) -> Result<Box<dyn SerialPort>, String> {
+        validate_port_name(&self.port_name)?;
+
         serialport::new(&self.port_name, self.baud_rate)
             .data_bits(self.data_bits)
             .flow_control(self.flow_control)
@@ -48,22 +55,48 @@ impl SerialPortManager {
             .map_err(|err| format!("failed to open {}: {err}", self.port_name))
     }
 
+    /// Closes the provided serial connection by flushing pending outbound bytes first.
+    ///
+    /// The physical close happens when the boxed port is dropped by the caller.
+    pub fn close(&self, mut port: Box<dyn SerialPort>) -> Result<(), String> {
+        port.flush()
+            .map_err(|err| format!("failed to flush {} before close: {err}", self.port_name))
+    }
+
     /// Sends bytes to the provided serial connection.
     pub fn send(&self, port: &mut dyn SerialPort, data: &[u8]) -> Result<(), String> {
-        use std::io::Write;
+        if data.is_empty() {
+            return Ok(());
+        }
+
         port.write_all(data)
             .and_then(|_| port.flush())
             .map_err(|err| format!("failed to send data on {}: {err}", self.port_name))
     }
 
     /// Receives data from the provided serial connection.
+    ///
+    /// Read size is capped to avoid unexpectedly large allocations from caller input.
     pub fn receive(&self, port: &mut dyn SerialPort) -> Result<Vec<u8>, String> {
-        use std::io::Read;
-        let mut buffer = vec![0_u8; 1024];
+        let mut buffer = vec![0_u8; MAX_RECEIVE_BYTES];
         let bytes_read = port
             .read(&mut buffer)
             .map_err(|err| format!("failed to read data on {}: {err}", self.port_name))?;
         buffer.truncate(bytes_read);
         Ok(buffer)
     }
+}
+
+fn validate_port_name(port_name: &str) -> Result<(), String> {
+    let trimmed = port_name.trim();
+
+    if trimmed.is_empty() {
+        return Err("serial port name cannot be empty".to_string());
+    }
+
+    if trimmed.chars().any(|ch| ch.is_control()) {
+        return Err("serial port name contains control characters".to_string());
+    }
+
+    Ok(())
 }
