@@ -3,7 +3,7 @@ import sizeOf from 'image-size';
 import TextToSVG from 'text-to-svg';
 
 /**
- * 支持svg, jpg, png, bmp等多种文件格式
+ * Supports multiple image formats (svg, jpg, png, bmp, etc.).
  * doc: https://github.com/image-size/image-size#readme
  * @param imagePath
  * @returns {{width: *, height: *}}
@@ -20,13 +20,13 @@ const getUniqueFilename = (filename) => {
     return Date.now() + path.extname(filename);
 };
 
-//将utf-8编码的字节数组，转为utf-8编码的字符串
-//https://www.yuque.com/qkd6oi/ztk6hz/vmnai3
+// Convert UTF-8 encoded byte array into UTF-8 string.
+// Ref: https://www.yuque.com/qkd6oi/ztk6hz/vmnai3
 const utf8bytes2string = (bytes) => {
     /**
-     * 初始化字节流,把-128至128的区间改为0-256的区间.便于计算
-     * @param {Array} array 字节流数组
-     * @return {Array} 转化好的字节流数组
+     * Normalize bytes to unsigned range (0-255) for easier bit operations.
+     * @param {Array} array byte-array
+     * @return {Array} normalized byte-array
      */
     const _init = (array) => {
         for (let i = 0; i < array.length; i++) {
@@ -88,7 +88,7 @@ const string2utf8bytes = (str) => {
     return utf8bytes;
 };
 
-// 计算异或
+// Compute XOR checksum.
 const calculateXOR = (bytes) => {
     let xor = bytes[0];
     for (let i = 1; i < bytes.length; i++) {
@@ -97,9 +97,9 @@ const calculateXOR = (bytes) => {
     return xor;
 };
 
-//options: https://github.com/shrhdk/text-to-svg
+// options: https://github.com/shrhdk/text-to-svg
 const text2svg = (text, options = {}) => {
-    const textToSVG = TextToSVG.loadSync(); //使用默认字体
+    const textToSVG = TextToSVG.loadSync(); // Use default font.
     const svg = textToSVG.getSVG(text, options);
 
     const {width, height} = textToSVG.getMetrics(text, options);

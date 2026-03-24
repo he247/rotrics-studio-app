@@ -60,10 +60,23 @@ Since this app interacts with hardware, ensure your robot is connected to `/dev/
 - `Dockerfile`: Multi-stage build for a lean production image.
 - `docker-compose.yml`: Local deployment setup with hardware mapping.
 
-## 📝 Notes on Migration
-- All original Chinese comments have been translated to English.
-- The project now uses **Axum/Tauri** for internal APIs instead of the previous Koa server.
-- Memory safety and performance are significantly improved by using Rust.
+## ✅ Recent Review and Corrections
+During this maintenance pass, the Rust modules were evaluated and cleaned up:
+- Added clear Rustdoc comments to improve maintainability.
+- Replaced placeholder serial-port methods with practical implementations for listing/opening/sending/receiving.
+- Fixed G-code filtering to correctly ignore whitespace-only lines and inline comments.
+- Switched command queue internals to `VecDeque` for efficient FIFO reads.
+- Added parser/serial defensive limits and input validation to reduce memory or malformed-input risk.
+
+## 📝 Commit Message Translation Tip (EN + ZH)
+When a commit message starts in Chinese, add an English equivalent in the body so both local and international contributors can quickly understand changes.
+
+Example:
+```text
+feat: 完善串口管理模块
+
+English: Improve serial port manager with open/read/write helpers.
+```
 
 ---
 
