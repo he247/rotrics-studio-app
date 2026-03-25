@@ -1,0 +1,34 @@
+{
+  "package": {
+    "productName": "rotrics-studio-app",
+    "version": "0.1.0"
+  },
+  "build": {
+    "distDir": "../dist",
+    "devPath": "http://localhost:3000",
+    "beforeDevCommand": "",
+    "beforeBuildCommand": ""
+  },
+  "tauri": {
+    "allowlist": {
+      "all": true
+    },
+    "bundle": {
+      "active": true,
+      "targets": "all",
+      "identifier": "com.rotrics.studio"
+    },
+    "security": {
+      "csp": "default-src 'self'"
+    },
+    "windows": [
+      {
+        "fullscreen": false,
+        "resizable": true,
+        "title": "Rotrics Studio App",
+        "width": 800,
+        "height": 600
+      }
+    ]
+  }
+}
