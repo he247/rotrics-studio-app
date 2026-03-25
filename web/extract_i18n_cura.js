@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-//从filePathIn读取，写入到filePathOutput
+// Read from filePathIn and write normalized JSON to filePathOutput.
 const extract = (filePathIn, filePathOutput) => {
     const jsObj = {};
     const content = fs.readFileSync(filePathIn, 'utf8');
@@ -18,10 +18,12 @@ const extract = (filePathIn, filePathOutput) => {
             ) {
                 let msgid = line1.replace("msgid", "").trim();
                 let msgstr = line2.replace("msgstr", "").trim();
-                //去除前后的"引号"，并去除转义
-                //因为jsObj[msgid] = msgid; 最后变成json文件，会自动转义
+
+                // Remove wrapping quotes and unescape backslashes.
+                // JSON serialization will handle the final escaping format.
                 msgid = msgid.substr(1, msgid.length - 2).replace(/\\/g, "").trim();
                 msgstr = msgstr.substr(1, msgstr.length - 2).replace(/\\/g, "").trim();
+
                 if (msgstr.length === 0) {
                     jsObj[msgid] = msgid;
                 } else {
@@ -34,8 +36,8 @@ const extract = (filePathIn, filePathOutput) => {
 };
 
 /**
- * 从i18n_cura目录中，抽取需要的翻译字段
- * 并写到/build-web/asset/i18n/cura/中
+ * Extract translation keys from i18n_cura and write outputs to:
+ * /build-web/asset/i18n/cura/
  */
 const extract_i18n_cura = () => {
     const dirIn = "./i18n_cura/";
@@ -45,7 +47,7 @@ const extract_i18n_cura = () => {
     fs.mkdirSync(dirOutput, {recursive: true});
 
     const filenames = fs.readdirSync(dirIn);
-    const subDirNames = []; //i18n_cura下文件夹名字
+    const subDirNames = []; // Folder names under i18n_cura.
     filenames.forEach((filename) => {
         const stats = fs.statSync(`${dirIn}${filename}`);
         if (stats.isDirectory()) {
@@ -55,14 +57,14 @@ const extract_i18n_cura = () => {
 
     subDirNames.forEach((subDirName) => {
         const filePathIn = `${dirIn}${subDirName}/${fdmJsonFilename}`;
-        //下划线变中线
+        // Convert locale names from underscore to dash (e.g. zh_CN -> zh-CN).
         const filePathOut = `${dirOutput}${subDirName.replace("_", "-")}.json`;
         if (fs.existsSync(filePathIn)) {
             extract(filePathIn, filePathOut);
         }
     });
 
-    //english
+    // English template
     const filePathIn4en = `${dirIn}fdmprinter.def.json.pot`;
     const filePathOutput4en = `${dirOutput}en.json`;
 
@@ -70,9 +72,3 @@ const extract_i18n_cura = () => {
 };
 
 module.exports = extract_i18n_cura;
-
-
-
-
-
-
